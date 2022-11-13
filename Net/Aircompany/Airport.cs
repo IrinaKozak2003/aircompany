@@ -1,6 +1,5 @@
 ﻿using Aircompany.Models;
 using Aircompany.Planes;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,12 +17,9 @@ namespace Aircompany
         public List<PassengerPlane> GetPassengersPlanes()
         {
             List<PassengerPlane> passengerPlanes = new List<PassengerPlane>();
-            for (int i=0; i < Planes.Count; i++)
+            foreach (PassengerPlane i in Planes.Where(plane => plane.GetType()==typeof(PassengerPlane)))
             {
-                if (Planes[i].GetType() == typeof(PassengerPlane))
-                {
-                    passengerPlanes.Add((PassengerPlane)Planes[i]);
-                }
+                passengerPlanes.Add(i);
             }
             return passengerPlanes;
         }
@@ -31,51 +27,36 @@ namespace Aircompany
         public List<MilitaryPlane> GetMilitaryPlanes()
         {
             List<MilitaryPlane> militaryPlanes = new List<MilitaryPlane>();
-            for (int i = 0; i < Planes.Count; i++)
+            foreach (MilitaryPlane i in Planes.Where(plane => plane.GetType() == typeof(MilitaryPlane) ))
             {
-                if (Planes[i].GetType() == typeof(MilitaryPlane))
-                {
-                    militaryPlanes.Add((MilitaryPlane)Planes[i]);
-                }
+                militaryPlanes.Add(i);
             }
             return militaryPlanes;
         }
 
         public PassengerPlane GetPassengerPlaneWithMaxPassengersCapacity()
         {
-            List<PassengerPlane> passengerPlanes = GetPassengersPlanes();
-            return passengerPlanes.Aggregate((w, x) => w.PassengersCapacityIs() > x.PassengersCapacityIs() ? w : x);             
+            return GetPassengersPlanes().OrderBy(plane =>plane._passengersCapacity ).Last();
         }
 
         public List<MilitaryPlane> GetTransportMilitaryPlanes()
         {
-            List<MilitaryPlane> transportMilitaryPlanes = new List<MilitaryPlane>();
-            List<MilitaryPlane> militaryPlanes = GetMilitaryPlanes();
-            for (int i = 0; i < militaryPlanes.Count; i++)
-            {
-                MilitaryPlane plane = militaryPlanes[i];
-                if (plane.PlaneTypeIs() == MilitaryType.TRANSPORT)
-                {
-                    transportMilitaryPlanes.Add(plane);
-                }
-            }
-
-            return transportMilitaryPlanes;
+            return new List<MilitaryPlane>(GetMilitaryPlanes().Where(x=>x.PlaneType==MilitaryType.TRANSPORT));
         }
 
         public Airport SortByMaxDistance()
         {
-            return new Airport(Planes.OrderBy(w => w.MAXFlightDistance()));
+            return new Airport(Planes.OrderBy(w => w.MaxFlightDistance));
         }
 
         public Airport SortByMaxSpeed()
         {
-            return new Airport(Planes.OrderBy(w => w.GetMS()));
+            return new Airport(Planes.OrderBy(w => w.MaxSpeed));
         }
 
         public Airport SortByMaxLoadCapacity()
         {
-            return new Airport(Planes.OrderBy(w => w.MAXLoadCapacity()));
+            return new Airport(Planes.OrderBy(w => w.MaxLoadCapacity));
         }
 
 
@@ -87,7 +68,7 @@ namespace Aircompany
         public override string ToString()
         {
             return "Airport{" +
-                    "planes=" + string.Join(", ", Planes.Select(x => x.GetModel())) +
+                    "planes=" + string.Join(", ", Planes.Select(x => x.Model)) +
                     '}';
         }
     }
